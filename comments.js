@@ -1,59 +1,27 @@
-// Resource Creation Endpoint.
+// List Resources
 
-// 1. I refactored the server.js code.
-// 2. First, I removed the mongoose specific start up code into a separate file and
-//    imported this file, in server.js.
-// 3. Next, I added the todo model creation code to the todo.js file, and imported this file
-//    in server.js
-// 4. I also added the user model creation code to the user.js file, and imported this file 
-//    in server.js.
-// 5. I installed express and body-parser. Body-parser, parses incoming request bodies in a
-//    middleware before handlers in routes kick-in.
-// 6. I tested that the server starts up on port 3000, by including a print statement, console.
-//    log(req.body), in a route handler (app.post('todos', (req, res))).
-// 7. I then opened Postman, and in the POST command:
-//    1. Entered the URL, 'localhost:3000/todos', which is the URL we want to post to.
-//    2. Under 'Body', we selected 'raw' and under 'text' we chose application/json.
-//    3. In 'Body', I typed the below and clicked send. Nothing should happen, since we have
-//       not setup routes as yet. The message below however does show up on the console, because
-//       in the route that handles /todos, we have the statement, console.log(req.body), and the
-//       the req.body is what we typed below.
-//  	 {
-//           "text": "This is from Postman"
-//       }
-// 8. I then removed the print statement, console.log(req.body), and setup an actual route handler.
-//    1. I created a document (in MongoDB parlance), which is simply an instance of a model. Note,
-//       I had defined a schema and the model, Todo, in todo.js. Note, within this document, I 
-//       grab the text property of the incoming request. req.body contains key-value pairs of
-//       data submitted in the request body. By default, it is undefined, but gets populated when
-//       we use body parsing middleware, such body-parser.
-//    2. I then saved this document to the database, using todo.save(), which we know returns a
-//       promise. And promise.then() allows us to handle the success and failure events. The 
-//       success event sends the document back to the client, and the failure event sends the
-//       error back to the client.
-//    3. Note, I use res.status(400).send(e). This sends the error code 400 and the error object
-//       so the user can detect what went wrong. To see the HTTP status codes, type 'http status
-//       codes' in google.
-// 9. I restarted server.
-// 10.I tested the above code using postman, for both valid user input and invalid user input. 
-//    1. For example, for valid user input, I used the same text as in #7. I get a 200 response and the 
-//       JSON response is exactly what we expected: "text": "This is from postman", "_id":"12213131...",
-//       "completedAt": null, "completed": false. This is because we grabbed the text property from the
-//       req object (ie. req.body.text). Note, The req object represents the HTTP request and has properties 
-//       for the request query string, parameters, body, HTTP headers, and so on.
-//    2. For example, for invalid user input, I sent an empty string in Postman, instead of the #7.
-//       We get back a '400 bad request' response error in Postman. Postman also shows the complete
-//       error object, and if we wanted we could pull out the exact error, ie. the text field failed,
-//       and the message is, 'Path text is required', and print this.
-//       {
-//          "errors": {
-//              "text": {
-//                  "message": "Path text is required",
-//                  "name": ValidationError,
-//                  etc...
-//              }
-//          }
-//       }
-// 11. We can go to Robomongo and check that a record was created, with _id, completed, completedAt, text
-//     _v properties.
-// 12. I added the changes to git.
+// 1. I write a route handler for getting all the todos.
+// 2. Note, mongoose async operations, such as save, queries, return thenables. So we can
+//    do things like MyModel.find().then(). However, do note, mongoose queries are not
+//    promises. They have a .then() function as a convenience. I did use this in the code
+//    when I write the route handler for POST. Also, recall, a model is a collection of
+//    documents, and an instance of a model is a document. So, a query is not a full fledged
+//    promise, but it does a .then() method.
+// 3  I used the same format for app.get as I did for app.post. However, the callback body
+//    is different - I now use the model (collection) and the find() method to get all the
+//    documents. Since, the query Todo.find() is thenable, I append a .then() method, to 
+//    define the sucess and failure handlers. In the success handler, I return the todos,
+//    and in the failure handler, I return an error. One thing to note, I did not return the
+//    the todos array, and instead returned an object, {todos}, (ie. an object with the array)
+//    since this allows me flexibility to return additional entities if I want to. With an array 
+//    I did not have this flexibility.
+// 4. Then I started the server application: node server/server.js. The server started on port 3000.
+// 5. Now, I opened Postman. I ran with GET and localhost:3000/todos. I see all the todos below
+//    in the Body. Nice! I also created and saved these routes for easily running these routes
+//    in the future. See "Chapter Install Postman" on how to do this. Note, just to repeat, this
+//    is done by Save -> Save As -> Enter name of route -> Enter collection we want to save in
+//    or create a new collection. When we want to run, we can click on the route in left bar ->
+//    Send. Note, I can simultaneously study Robo3T to see that todos are being created, when I
+//    POST. I created another POST and then ran a GET and it all works!
+// 6. Made a commit.
+// 
