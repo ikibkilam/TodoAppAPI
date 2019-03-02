@@ -1,27 +1,28 @@
-// List Resources
+// Get single resource.
 
-// 1. I write a route handler for getting all the todos.
-// 2. Note, mongoose async operations, such as save, queries, return thenables. So we can
-//    do things like MyModel.find().then(). However, do note, mongoose queries are not
-//    promises. They have a .then() function as a convenience. I did use this in the code
-//    when I write the route handler for POST. Also, recall, a model is a collection of
-//    documents, and an instance of a model is a document. So, a query is not a full fledged
-//    promise, but it does a .then() method.
-// 3  I used the same format for app.get as I did for app.post. However, the callback body
-//    is different - I now use the model (collection) and the find() method to get all the
-//    documents. Since, the query Todo.find() is thenable, I append a .then() method, to 
-//    define the sucess and failure handlers. In the success handler, I return the todos,
-//    and in the failure handler, I return an error. One thing to note, I did not return the
-//    the todos array, and instead returned an object, {todos}, (ie. an object with the array)
-//    since this allows me flexibility to return additional entities if I want to. With an array 
-//    I did not have this flexibility.
-// 4. Then I started the server application: node server/server.js. The server started on port 3000.
-// 5. Now, I opened Postman. I ran with GET and localhost:3000/todos. I see all the todos below
-//    in the Body. Nice! I also created and saved these routes for easily running these routes
-//    in the future. See "Chapter Install Postman" on how to do this. Note, just to repeat, this
-//    is done by Save -> Save As -> Enter name of route -> Enter collection we want to save in
-//    or create a new collection. When we want to run, we can click on the route in left bar ->
-//    Send. Note, I can simultaneously study Robo3T to see that todos are being created, when I
-//    POST. I created another POST and then ran a GET and it all works!
-// 6. Made a commit.
-// 
+// 1. The code to get one resource is similar to that of getting all resources. I created
+//    this module, and then used res.send(req.params) and Postman to see what req.params,
+//    returns. 
+// 2. First, what are route parameters? Route parameters are named URL segments that are
+//    used to capture the values specified at their position in the URL. The captured values
+//    are populated in the req.params object, with the name of the route parameter in the
+//    path as the respective key. So, Req.params is an object, with key-value pairs.
+//    See https://expressjs.com/en/guide/routing.html#route-parameters.
+// 3. When I run the app.get module with 'todos/:id', this gets translated into todos/id/123,
+//    where 123 is some number (could be any number). I test this with Postman, where I
+//    entered the url localhost:3000/todos/id/123, used GET and I see that the param object
+//    returned is {"id": "123"}. I then commented this module, and wrote another app.get
+//    module that actually gets a single document from the database.
+// 4. To get a single document from the database, I used req.params.id to get the id that
+//    was sent in the request. I then used findById method, using a then and catch methods.
+//    The then method has a check for an ID that did not exist in collection, and if it did
+//    not, we send back an error code, without error object (since there might sensitive
+//    information in the body). If ID exists, we send back the todo. The catch code sends
+//    back an error code, but without the error object (for the same reason as aforementioned).
+// 5. Note, it is best to use return statements when the ObjectID is not valid and when todo
+//    does not exist, since this then stops further execution. Note that todos/:id gets resolved
+//    to a URL, localhost:3000/todos/5c79704251577c0500ca434d.
+// 6. Note, I did test the cases, where the ID is just incorrect, and the case where id format is
+//    right but the ID and hence the todo did not exist. In this case, I get 404 errors.
+// 7. I saved the request in the todos collection in Postman.
+// 8. I committed the changes and pushed them to github, using git commit -a -m ''.
