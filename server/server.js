@@ -41,13 +41,14 @@ app.get('/todos', (req, res) => {
     });
 });
 
-// // 7. Get one route
+// // 7. Get one route with route parameter
 // app.get('/todos/:id', (req, res) => {
 //     res.send(req.params);
 // })  
 
 // 7. Get one route
 app.get('/todos/:id', (req, res) => {
+    // Get the ID.
     var id = req.params.id;
     console.log(id);
     // ID is simply not valid - eg: an extra digit.
@@ -66,7 +67,30 @@ app.get('/todos/:id', (req, res) => {
     });
 });
 
-// 8. Bind app to port
+// 8. Delete a todo.
+app.delete('/todos/:id', (req, res) => {
+    // Get the ID.
+    var id = req.params.id;
+    console.log(id);
+    // Validate ID. If not valid return 404.
+    if(!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+    // Remove todo by ID.
+    Todo.findByIdAndDelete(id).then((todo) => {
+        // Success.
+        // If ID does not exist in collection, return 404.
+        if (!todo) {
+            return res.status(404).send();
+        }
+        res.send(todo);
+    }).catch((error) => {
+        //Failure. Return 400 for example, if server is down.
+    res.status(400).send();
+    });
+});
+
+// 9. Bind app to port
 app.listen(3000, () => {
     console.log('Started server on port 3000');
 });
